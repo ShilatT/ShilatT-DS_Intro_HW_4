@@ -1,0 +1,32 @@
+dest = open('dests.txt', 'r')
+
+import json
+import requests
+import urllib
+
+parms = dict()
+countries = dict()
+parms['origins'] = 'Jerusalem'
+parms['key'] = 'AIzaSyDofjbStkg08jMsRi7r_d4VwUBVWpXuQf000000'
+for i in dest:
+    parms['destinations'] = i
+    
+    serviceurl = "https://maps.googleapis.com/maps/api/distancematrix/json?"
+    url = serviceurl + urllib.parse.urlencode(parms)
+    response = requests.get(url).json()
+
+    url1 = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (parms['destinations'], parms['key'])
+    response1 = requests.get(url1).json()
+              
+    destinations = response['destination_addresses'][0]
+    origin = response['origin_addresses'][0]
+    lat =  response1['results'][0]['geometry']['location']['lat']
+    lng = response1['results'][0]['geometry']['location']['lng']
+    dist = response['rows'][0]['elements'][0]['distance']['value']
+    duration = response['rows'][0]['elements'][0]['duration']['value']
+    
+    countries[i] = (lat, lng, dist, duration)
+    
+    
+    for key, val in countries.items():  
+    print(key, val)
